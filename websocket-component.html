@@ -26,7 +26,9 @@
 				},
 				status: {
 					type: Number,
+					readOnly: true,
 					notify: true,
+					reflectToAttribute: true,
 					value: -1
 				},
 				_ws: {
@@ -78,10 +80,10 @@
 			_computeStatus: function(readyState)
 			{
 				if(this._ws) {
-					this.set('status', this._ws.readyState);
+					this._setStatus(this._ws.readyState);
 				}
 				else {
-					this.set('status', -1);
+					this._setStatus(-1);
 				}
 			}
 		});
