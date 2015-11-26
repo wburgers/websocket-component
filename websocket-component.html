@@ -1,0 +1,89 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+@element Websocket-component
+@demo demo/index.html
+-->
+
+<dom-module id="websocket-component">
+	<template>
+		<style>
+			:host {
+				display: none;
+			}
+		</style>
+	</template>
+	<script>
+		Polymer({
+			is: "websocket-component",
+			properties: {
+				url: {
+					type: String
+				},
+				protocols: {
+					type: Array,
+					value: function() { return []; }
+				},
+				status: {
+					type: Number,
+					notify: true,
+					value: -1
+				},
+				_ws: {
+					type: Object
+				}
+			},
+			observers: [
+				'_computeStatus(_ws.readyState)'
+			],
+			open: function() {
+				if(this._ws) {
+					throw new Error("websocket-component(open): already connected");
+				}
+				if(!this.url) {
+					throw new Error("websocket-component(open): no url specified.");
+				}
+				this._ws = new WebSocket(this.url, this.protocols);
+				this._ws.onopen = this._onwsopen.bind(this);
+				this._ws.onerror = this._onwserror.bind(this);
+				this._ws.onmessage = this._onwsmessage.bind(this);
+				this._ws.onclose = this._onwsclose.bind(this);
+			},
+			send: function(data) {
+				if(!this._ws) {
+					throw new Error("websocket-component(send): not connected.");
+				}
+				this._ws.send(data);
+			},
+			close: function() {
+				if(!this._ws) {
+					throw new Error("websocket-component(close): not connected.");
+				}
+				this._ws.close();
+				this._ws = null;
+			},
+			_onwsopen: function() {
+				this.fire("websocket-open");
+			},
+			_onwserror: function() {
+				this.fire("websocket-error");
+			},
+			_onwsmessage: function(event) {
+				var data = event.data;
+				this.fire("websocket-message", { data: data });
+			},
+			_onwsclose: function(event) {
+				this.fire("websocket-close", { code: event.code, reason: event.reason });
+			},
+			_computeStatus: function(readyState)
+			{
+				if(this._ws) {
+					this.set('status', this._ws.readyState);
+				}
+				else {
+					this.set('status', -1);
+				}
+			}
+		});
+	</script>
+</dom-module>

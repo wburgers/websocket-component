@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+		<title>websocket-component Demo</title>
+		<script src="../../webcomponentsjs/webcomponents-lite.min.js"></script>
+		<link rel="import" href="../websocket-component.html">
+	</head>
+	<body>
+		<websocket-component id="websocket" url="wss://echo.websocket.org"></websocket-component>
+		<script>
+			var ws_element = document.getElementById('websocket');
+			ws_element.open();
+
+			document.addEventListener('websocket-message', function(event) {
+				console.log("Message received from echo websocket server", event.detail.data);
+			});
+
+			document.addEventListener('websocket-open', function() {
+				ws_element.send("test");
+			});
+		</script>
+
+	</body>
+</html>

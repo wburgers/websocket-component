@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+    <script src="../../web-component-tester/browser.js"></script>
+
+    <link rel="import" href="../websocket-component.html">
+  </head>
+  <body>
+
+    <test-fixture id="websocketComponentWithoutURL">
+			<template>
+				<websocket-component></websocket-component>
+			</template>
+		</test-fixture>
+
+		<test-fixture id="websocketComponentWithURL">
+			<template>
+				<websocket-component url="wss://echo.websocket.org"></websocket-component>
+			</template>
+		</test-fixture>
+
+		<test-fixture id="websocketComponentWithActiveConnection">
+			<template>
+				<websocket-component url="wss://echo.websocket.org"></websocket-component>
+			</template>
+		</test-fixture>
+
+    <script>
+			var websocketElementWithoutURL;
+			var websocketElementWithURL;
+
+			setup(function() {
+				websocketElementWithoutURL = fixture("websocketComponentWithoutURL");
+				websocketElementWithURL = fixture("websocketComponentWithURL");
+			});
+
+      suite('<websocket-component>', function() {
+				test('element without url loads ok', function() {
+					expect(websocketElementWithoutURL).to.be.ok;
+				});
+
+				test('open without url throws exception', function() {
+					expect(websocketElementWithoutURL.open).to.throw(Error, 'websocket-component(open): no url specified.');
+				});
+
+				test('close without an open connection throws error', function() {
+					expect(websocketElementWithoutURL.close).to.throw(Error, 'websocket-component(close): not connected.');
+				});
+
+				test('send without an open connection throws error', function() {
+					expect(function() {
+						websocketElementWithoutURL.send("test")
+					}).to.throw(Error, 'websocket-component(send): not connected.');
+				});
+
+				test('element with a url loads ok', function() {
+					expect(websocketElementWithURL).to.be.ok;
+				});
+
+				test('element status is -1 on load', function() {
+					assert.equal(websocketElementWithURL.status, -1, "The status should be -1");
+				});
+
+				test('element status is 0 after connecting', function() {
+					websocketElementWithURL.open();
+					assert.equal(websocketElementWithURL.status, 0, "The status should be -1");
+				});
+      });
+
+			a11ySuite("websocketComponentWithoutURL");
+    </script>
+  </body>
+</html>

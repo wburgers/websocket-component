@@ -1,0 +1,23 @@
+{
+  "name": "websocket-component",
+  "version": "1.0.0",
+  "homepage": "https://github.com/wburgers/websocket-component",
+  "description": "A websocket element wrapper",
+  "main": "websocket-component.html",
+  "authors": [
+    "Willem Burgers"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.1.0"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+		"web-component-tester": "*"
+  }
+}
