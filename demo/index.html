@@ -13,7 +13,7 @@
 			var ws_element = document.getElementById('websocket');
 
 			document.addEventListener('websocket-message', function(event) {
-				console.log("Message received from echo websocket server", event.detail.data);
+				console.log("Message received from echo websocket server:", event.detail.data);
 			});
 
 			document.addEventListener('websocket-open', function() {
