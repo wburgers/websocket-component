@@ -18,7 +18,9 @@
 			is: "websocket-component",
 			properties: {
 				url: {
-					type: String
+					type: String,
+					value: "",
+					observer: '_urlChange'
 				},
 				protocols: {
 					type: Array,
@@ -30,8 +32,14 @@
 					notify: true,
 					value: -1
 				},
+				auto: {
+					type: Boolean,
+					value: false,
+					observer: '_autoChange'
+				},
 				_ws: {
-					type: Object
+					type: Object,
+					observer: '_wsChange'
 				}
 			},
 			observers: [
@@ -67,6 +75,7 @@
 				this.fire("websocket-open");
 			},
 			_onwserror: function() {
+				this._setStatus(-1);
 				this.fire("websocket-error");
 			},
 			_onwsmessage: function(event) {
@@ -74,15 +83,33 @@
 				this.fire("websocket-message", { data: data });
 			},
 			_onwsclose: function(event) {
+				this._setStatus(-1);
 				this.fire("websocket-close", { code: event.code, reason: event.reason });
 			},
-			_computeStatus: function(readyState)
-			{
+			_computeStatus: function(readyState) {
 				if(this._ws) {
 					this._setStatus(this._ws.readyState);
 				}
 				else {
 					this._setStatus(-1);
+				}
+			},
+			_urlChange: function() {
+				if(this.auto && this.url.length > 0) {
+					if(this._ws) {
+						this.close();
+					}
+					this.open();
+				}
+			},
+			_autoChange: function() {
+				if(!this._ws && this.auto && this.url.length > 0) {
+					this.open();
+				}
+			},
+			_wsChange: function() {
+				if(!this._ws) {
+					this._computeStatus(undefined);
 				}
 			}
 		});

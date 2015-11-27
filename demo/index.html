@@ -8,10 +8,9 @@
 		<link rel="import" href="../websocket-component.html">
 	</head>
 	<body>
-		<websocket-component id="websocket" url="wss://echo.websocket.org"></websocket-component>
+		<websocket-component id="websocket" url="wss://echo.websocket.org" auto></websocket-component>
 		<script>
 			var ws_element = document.getElementById('websocket');
-			ws_element.open();
 
 			document.addEventListener('websocket-message', function(event) {
 				console.log("Message received from echo websocket server", event.detail.data);
