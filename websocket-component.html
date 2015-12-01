@@ -1,7 +1,13 @@
 <link rel="import" href="../polymer/polymer.html">
 
 <!--
-@element Websocket-component
+A Polymer wrapper for a websocket connection.
+
+Example:
+
+    <websocket-component auto url="wss://echo.websocket.org"></websocket-component>
+
+@element websocket-component
 @demo demo/index.html
 -->
 
@@ -17,21 +23,33 @@
 		Polymer({
 			is: "websocket-component",
 			properties: {
+				/**
+				* The url to connect to
+				*/
 				url: {
 					type: String,
 					value: "",
 					observer: '_urlChange'
 				},
+				/**
+				* An array of subprotocols for the websocket
+				*/
 				protocols: {
 					type: Array,
 					value: function() { return []; }
 				},
+				/**
+				* This status represents the websocket status. Any other element can bind to this status to get updates.
+				*/
 				status: {
 					type: Number,
 					readOnly: true,
 					notify: true,
 					value: -1
 				},
+				/**
+				* If this boolean is set, the websocket will automatically connect when the url is specified
+				*/
 				auto: {
 					type: Boolean,
 					value: false,
@@ -45,6 +63,9 @@
 			observers: [
 				'_computeStatus(_ws.readyState)'
 			],
+			/**
+			* Open the connection manually. May throw errors when already connected or no url is specified.
+			*/
 			open: function() {
 				if(this._ws) {
 					throw new Error("websocket-component(open): already connected");
@@ -58,12 +79,18 @@
 				this._ws.onmessage = this._onwsmessage.bind(this);
 				this._ws.onclose = this._onwsclose.bind(this);
 			},
+			/**
+			* Send data over the websocket. Throws an error when the websocket is not connected.
+			*/
 			send: function(data) {
 				if(!this._ws) {
 					throw new Error("websocket-component(send): not connected.");
 				}
 				this._ws.send(data);
 			},
+			/**
+			* Close the connection manually. Trows an error when the websocket is not connected.
+			*/
 			close: function() {
 				if(!this._ws) {
 					throw new Error("websocket-component(close): not connected.");
@@ -74,13 +101,12 @@
 			_onwsopen: function() {
 				this.fire("websocket-open");
 			},
-			_onwserror: function() {
+			_onwserror: function(error) {
 				this._setStatus(-1);
-				this.fire("websocket-error");
+				this.fire("websocket-error", {data: error.data});
 			},
 			_onwsmessage: function(event) {
-				var data = event.data;
-				this.fire("websocket-message", { data: data });
+				this.fire("websocket-message", { data: event.data });
 			},
 			_onwsclose: function(event) {
 				this._setStatus(-1);
