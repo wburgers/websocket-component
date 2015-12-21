@@ -24,17 +24,19 @@
 
 		<test-fixture id="websocketComponentWithActiveConnection">
 			<template>
-				<websocket-component url="wss://echo.websocket.org"></websocket-component>
+				<websocket-component auto url="wss://echo.websocket.org"></websocket-component>
 			</template>
 		</test-fixture>
 
     <script>
 			var websocketElementWithoutURL;
 			var websocketElementWithURL;
+			var websocketElementWithActiveConnection;
 
 			setup(function() {
 				websocketElementWithoutURL = fixture("websocketComponentWithoutURL");
 				websocketElementWithURL = fixture("websocketComponentWithURL");
+				websocketElementWithActiveConnection = fixture("websocketComponentWithActiveConnection");
 			});
 
       suite('<websocket-component>', function() {
@@ -66,7 +68,29 @@
 
 				test('element status is 0 after connecting', function() {
 					websocketElementWithURL.open();
-					assert.equal(websocketElementWithURL.status, 0, "The status should be -1");
+					assert.equal(websocketElementWithURL.status, 0, "The status should be 0");
+				});
+
+				test('element fires an event when the connection is opened', function(done) {
+					websocketElementWithURL.addEventListener('websocket-open', function() {
+						done();
+					});
+					websocketElementWithURL.open();
+				});
+
+				test('property "auto" connects automatically', function() {
+					assert.equal(websocketElementWithActiveConnection.status, 0, "The status should be 0");
+				});
+
+				test('element fires an event when data is received', function(done) {
+					var data = "test";
+					websocketElementWithActiveConnection.addEventListener('websocket-message', function(event) {
+						assert.equal(event.detail.data, data);
+						done();
+					});
+					websocketElementWithActiveConnection.addEventListener('websocket-open', function() {
+						websocketElementWithActiveConnection.send(data);
+					});
 				});
       });
 
