@@ -30,72 +30,89 @@
 		</test-fixture>
 
     <script>
-			var websocketElementWithoutURL;
-			var websocketElementWithURL;
-			var websocketElementWithActiveConnection;
+		var websocketElementWithoutURL;
+		var websocketElementWithURL;
+		var websocketElementWithActiveConnection;
+		
+		var ws;
 
-			setup(function() {
-				websocketElementWithoutURL = fixture("websocketComponentWithoutURL");
-				websocketElementWithURL = fixture("websocketComponentWithURL");
-				websocketElementWithActiveConnection = fixture("websocketComponentWithActiveConnection");
+		setup(function() {
+			ws = {
+				readyState: 0,
+				send: function(data) {
+					this.onmessage({ 'data': data });
+				},
+				onopen: function() {
+				}
+			};
+			sinon.stub(window, "WebSocket").returns(ws);
+			websocketElementWithoutURL = fixture("websocketComponentWithoutURL");
+			websocketElementWithURL = fixture("websocketComponentWithURL");
+			websocketElementWithActiveConnection = fixture("websocketComponentWithActiveConnection");
+		});
+		
+		teardown(function() {
+			window.WebSocket.restore();
+		});
+
+		suite('<websocket-component>', function() {
+			test('element without url loads ok', function() {
+				expect(websocketElementWithoutURL).to.be.ok;
 			});
 
-      suite('<websocket-component>', function() {
-				test('element without url loads ok', function() {
-					expect(websocketElementWithoutURL).to.be.ok;
-				});
+			test('open without url throws exception', function() {
+				expect(websocketElementWithoutURL.open).to.throw(Error, 'websocket-component(open): no url specified.');
+			});
 
-				test('open without url throws exception', function() {
-					expect(websocketElementWithoutURL.open).to.throw(Error, 'websocket-component(open): no url specified.');
-				});
+			test('close without an open connection throws error', function() {
+				expect(websocketElementWithoutURL.close).to.throw(Error, 'websocket-component(close): not connected.');
+			});
 
-				test('close without an open connection throws error', function() {
-					expect(websocketElementWithoutURL.close).to.throw(Error, 'websocket-component(close): not connected.');
-				});
+			test('send without an open connection throws error', function() {
+				expect(function() {
+					websocketElementWithoutURL.send("test")
+				}).to.throw(Error, 'websocket-component(send): not connected.');
+			});
 
-				test('send without an open connection throws error', function() {
-					expect(function() {
-						websocketElementWithoutURL.send("test")
-					}).to.throw(Error, 'websocket-component(send): not connected.');
-				});
+			test('element with a url loads ok', function() {
+				expect(websocketElementWithURL).to.be.ok;
+			});
 
-				test('element with a url loads ok', function() {
-					expect(websocketElementWithURL).to.be.ok;
-				});
+			test('element status is -1 on load', function() {
+				assert.equal(websocketElementWithURL.status, -1, "The status should be -1");
+			});
 
-				test('element status is -1 on load', function() {
-					assert.equal(websocketElementWithURL.status, -1, "The status should be -1");
-				});
+			test('element status is 0 after connecting', function() {
+				websocketElementWithURL.open();
+				assert.equal(websocketElementWithURL.status, 0, "The status should be 0");
+			});
 
-				test('element status is 0 after connecting', function() {
-					websocketElementWithURL.open();
-					assert.equal(websocketElementWithURL.status, 0, "The status should be 0");
+			test('element fires an event when the connection is opened', function(done) {
+				websocketElementWithURL.addEventListener('websocket-open', function() {
+					done();
 				});
+				websocketElementWithURL.open();
+				ws.onopen();
+			});
 
-				test('element fires an event when the connection is opened', function(done) {
-					websocketElementWithURL.addEventListener('websocket-open', function() {
-						done();
-					});
-					websocketElementWithURL.open();
+			test('property "auto" connects automatically', function() {
+				assert.equal(websocketElementWithActiveConnection.status, 0, "The status should be 0");
+			});
+
+			test('element fires an event when data is received', function(done) {
+				var data = "test";
+				websocketElementWithActiveConnection.addEventListener('websocket-message', function(event) {
+					assert.equal(event.detail.data, data);
+					done();
 				});
-
-				test('property "auto" connects automatically', function() {
-					assert.equal(websocketElementWithActiveConnection.status, 0, "The status should be 0");
+				websocketElementWithActiveConnection.addEventListener('websocket-open', function() {
+					websocketElementWithActiveConnection.send(data);
 				});
+				ws.onopen();
+			});
+		});
 
-				test('element fires an event when data is received', function(done) {
-					var data = "test";
-					websocketElementWithActiveConnection.addEventListener('websocket-message', function(event) {
-						assert.equal(event.detail.data, data);
-						done();
-					});
-					websocketElementWithActiveConnection.addEventListener('websocket-open', function() {
-						websocketElementWithActiveConnection.send(data);
-					});
-				});
-      });
-
-			a11ySuite("websocketComponentWithoutURL");
+		a11ySuite("websocketComponentWithoutURL");
     </script>
   </body>
 </html>
