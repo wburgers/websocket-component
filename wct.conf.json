@@ -1,5 +1,4 @@
 {
-	"testTimeout": 300000,
 	"plugins": {
 		"sauce": {
 			"browsers": [{
