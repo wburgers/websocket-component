@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "homepage": "https://github.com/wburgers/websocket-component",
   "description": "A websocket element wrapper",
+  "keywords": ["web-components"],
   "main": "websocket-component.html",
   "authors": [
     "Willem Burgers"
