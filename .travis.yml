@@ -26,4 +26,4 @@ script:
   - xvfb-run wct --skip-plugin sauce
   - 'if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then wct --skip-plugin local; fi'
 after_success:
-  - ./ghpages_deploy.sh
+  - bash ./ghpages_deploy.sh wburgers websocket-component
