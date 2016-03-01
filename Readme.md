@@ -28,5 +28,5 @@ You can install this element with bower:
 bower i websocket-component -S
 ```
 
-More api documentation, a demo and the tests can be found [here] (wburgers.github.io/websocket-component).
+More api documentation, a demo and the tests can be found [here] (http://wburgers.github.io/websocket-component).
 (To see the tests, add `/test/` to the url after it resolves).
