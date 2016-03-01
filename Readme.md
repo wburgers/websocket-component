@@ -21,3 +21,12 @@ The following events are thrown:
 - "websocket-error": tells you there was an error. `event.detail.data` contains more info about the error.
 - "websocket-message": tells you a new message was received. `event.detail.data` contains the message.
 - "websocket-close": tells you the connection was closed. `event.detail.code` contains the closing code. `event.detail.reason` contains the reason code.
+
+### Install
+You can install this element with bower:
+```bash
+bower i websocket-component -S
+```
+
+More api documentation, a demo and the tests can be found [here] (wburgers.github.io/websocket-component).
+(To see the tests, add `/test/` to the url after it resolves).
