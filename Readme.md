@@ -15,7 +15,8 @@ As the example above shows, it is possible to data-bind to some of the websocket
 - The array of protocols to use.
 - The status of the connection can only be read, not set. Use it with [status-dot] (https://github.com/wburgers/OZWSS-Polymer-status-dot) for UI visibility of the connection status.
 - The auto propery tells the websocket to automatically connect on page load or url change. If auto is used, remember to data-bind the protocols before the url.
- 
+- The handle-visibility property tells the websocket to close the connection when the browser tab/page is out of focus and reopen when the tab is focussed.
+
 The following events are thrown:
 - "websocket-open": tells you the connection is opened.
 - "websocket-error": tells you there was an error. `event.detail.data` contains more info about the error.

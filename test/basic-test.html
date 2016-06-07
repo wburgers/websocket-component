@@ -12,28 +12,28 @@
   <body>
 
     <test-fixture id="websocketComponentWithoutURL">
-			<template>
-				<websocket-component></websocket-component>
-			</template>
-		</test-fixture>
+		<template>
+			<websocket-component></websocket-component>
+		</template>
+	</test-fixture>
 
-		<test-fixture id="websocketComponentWithURL">
-			<template>
-				<websocket-component url="ws://echo.websocket.org"></websocket-component>
-			</template>
-		</test-fixture>
+	<test-fixture id="websocketComponentWithURL">
+		<template>
+			<websocket-component url="ws://echo.websocket.org"></websocket-component>
+		</template>
+	</test-fixture>
 
-		<test-fixture id="websocketComponentWithActiveConnection">
-			<template>
-				<websocket-component auto url="ws://echo.websocket.org"></websocket-component>
-			</template>
-		</test-fixture>
+	<test-fixture id="websocketComponentWithActiveConnection">
+		<template>
+			<websocket-component auto url="ws://echo.websocket.org"></websocket-component>
+		</template>
+	</test-fixture>
 
     <script>
 		var websocketElementWithoutURL;
 		var websocketElementWithURL;
 		var websocketElementWithActiveConnection;
-		
+
 		var ws;
 
 		setup(function() {
@@ -50,7 +50,7 @@
 			websocketElementWithURL = fixture("websocketComponentWithURL");
 			websocketElementWithActiveConnection = fixture("websocketComponentWithActiveConnection");
 		});
-		
+
 		teardown(function() {
 			window.WebSocket.restore();
 		});

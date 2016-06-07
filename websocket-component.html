@@ -5,7 +5,7 @@ A Polymer wrapper for a websocket connection.
 
 Example:
 
-    <websocket-component auto url="wss://echo.websocket.org"></websocket-component>
+    <websocket-component auto handle-visibility url="wss://echo.websocket.org"></websocket-component>
 
 @element websocket-component
 @demo demo/index.html
@@ -55,6 +55,13 @@ Example:
 					value: false,
 					observer: '_autoChange'
 				},
+				/**
+				* If this boolean is set, the websocket will automatically close and reopen when the tab/page is out of focus and focussed again respectively
+				*/
+				handleVisibility: {
+					type: Boolean,
+					value: false,
+				},
 				_ws: {
 					type: Object,
 					observer: '_wsChange'
@@ -63,6 +70,11 @@ Example:
 			observers: [
 				'_computeStatus(_ws.readyState)'
 			],
+			ready: function () {
+				if (this.handleVisibility && typeof document.hidden !== 'undefined') {
+					document.addEventListener('visibilitychange', this._handleVisibilityChange.bind(this), false);
+				}
+			},
 			/**
 			* Open the connection manually. May throw errors when already connected or no url is specified.
 			*/
@@ -136,6 +148,13 @@ Example:
 			_wsChange: function() {
 				if(!this._ws) {
 					this._computeStatus(undefined);
+				}
+			},
+			_handleVisibilityChange() {
+				if (document.hidden) {
+					this.close();
+				} else {
+					this.open();
 				}
 			}
 		});
