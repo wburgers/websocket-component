@@ -6,7 +6,7 @@ branches:
   except:
     - gh-pages
 addons:
-  firefox: 45
+  firefox: "45.0"
   apt:
     sources:
       - google-chrome
