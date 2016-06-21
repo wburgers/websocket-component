@@ -8,11 +8,11 @@
 			}, {
 				"browserName": "chrome",
 				"platform": "Windows 10",
-				"version": "51"
+				"version": "latest"
 			}, {
 				"browserName": "firefox",
 				"platform": "Linux",
-				"version": "47"
+				"version": "latest"
 			}]
 		}
 	}
