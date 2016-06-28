@@ -1,6 +1,8 @@
-# websocket-component [![Build Status](https://travis-ci.org/wburgers/websocket-component.svg?branch=master)](https://travis-ci.org/wburgers/websocket-component)
+# websocket-component [![Build Status](https://travis-ci.org/wburgers/websocket-component.svg?branch=master)](https://travis-ci.org/wburgers/websocket-component) [![Build Status](https://saucelabs.com/open_sauce/build_status/wburgers.svg)](https://saucelabs.com/beta/builds/deb1c7b01e754f54b5e11100a74a1eb4)
 
 A Polymer wrapper for the Websocket API with support for subprotocols.
+
+[![Build Status](https://saucelabs.com/open_sauce/build_matrix/wburgers.svg)](https://saucelabs.com/beta/builds/deb1c7b01e754f54b5e11100a74a1eb4)
 
 ```html
 <websocket-component  url="{{wsURL}}"
