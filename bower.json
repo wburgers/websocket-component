@@ -8,7 +8,7 @@
   "authors": [
     "Willem Burgers"
   ],
-  "license": "MIT",
+  "license": "BSD",
   "ignore": [
     "**/.*",
     "node_modules",
