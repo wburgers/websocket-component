@@ -1,5 +1,7 @@
 <!--
-Copyright (c) 2016 Willem Burgers. All rights reserved.
+Copyright (c) 2016 Willem Burgers.
+							2017 Sebastian Tilsch
+All rights reserved.
 This code may only be used under the BSD style license found at http://wburgers.github.io/LICENSE.txt
 -->
 <link rel="import" href="../polymer/polymer.html">
@@ -24,65 +26,75 @@ Example:
 		</style>
 	</template>
 	<script>
-		Polymer({
-			is: "websocket-component",
-			properties: {
-				/**
-				* The url to connect to
-				*/
-				url: {
-					type: String,
-					value: "",
-					observer: '_urlChange'
-				},
-				/**
-				* An array of subprotocols for the websocket
-				*/
-				protocols: {
-					type: Array,
-					value: function() { return []; }
-				},
-				/**
-				* This status represents the websocket status. Any other element can bind to this status to get updates.
-				*/
-				status: {
-					type: Number,
-					readOnly: true,
-					notify: true,
-					value: -1
-				},
-				/**
-				* If this boolean is set, the websocket will automatically connect when the url is specified
-				*/
-				auto: {
-					type: Boolean,
-					value: false,
-					observer: '_autoChange'
-				},
-				/**
-				* If this boolean is set, the websocket will automatically close and reopen when the tab/page is out of focus and focussed again respectively
-				*/
-				handleVisibility: {
-					type: Boolean,
-					value: false,
-				},
-				_ws: {
-					type: Object,
-					observer: '_wsChange'
-				}
-			},
-			observers: [
-				'_computeStatus(_ws.readyState)'
-			],
-			ready: function () {
+		class WebsocketComponent extends Polymer.Element {
+			static get is() { return "websocket-component"; }
+
+			static get properties() {
+        return {
+          /**
+           * The url to connect to
+           */
+          url: {
+            type: String,
+            value: "",
+            observer: '_urlChange'
+          },
+          /**
+           * An array of subprotocols for the websocket
+           */
+          protocols: {
+            type: Array,
+            value: function () {
+              return [];
+            }
+          },
+          /**
+           * This status represents the websocket status. Any other element can bind to this status to get updates.
+           */
+          status: {
+            type: Number,
+            readOnly: true,
+            notify: true,
+            value: -1
+          },
+          /**
+           * If this boolean is set, the websocket will automatically connect when the url is specified
+           */
+          auto: {
+            type: Boolean,
+            value: false,
+            observer: '_autoChange'
+          },
+          /**
+           * If this boolean is set, the websocket will automatically close and reopen when the tab/page is out of focus and focussed again respectively
+           */
+          handleVisibility: {
+            type: Boolean,
+            value: false,
+          },
+          _ws: {
+            type: Object,
+            observer: '_wsChange'
+          }
+        }
+      }
+
+			static get observers() {
+        return [
+          '_computeStatus(_ws.readyState)'
+        ]
+      }
+
+      ready() {
+			  super.ready();
 				if (this.handleVisibility && typeof document.hidden !== 'undefined') {
 					document.addEventListener('visibilitychange', this._handleVisibilityChange.bind(this), false);
 				}
-			},
+			}
 			/**
 			* Open the connection manually. May throw errors when already connected or no url is specified.
 			*/
-			open: function() {
+			open() {
 				if(this._ws) {
 					throw new Error("websocket-component(open): already connected");
 				}
@@ -94,73 +106,75 @@ Example:
 				this._ws.onerror = this._onwserror.bind(this);
 				this._ws.onmessage = this._onwsmessage.bind(this);
 				this._ws.onclose = this._onwsclose.bind(this);
-			},
+			}
 			/**
 			* Send data over the websocket. Throws an error when the websocket is not connected.
 			*/
-			send: function(data) {
+			send(data) {
 				if(!this._ws) {
 					throw new Error("websocket-component(send): not connected.");
 				}
 				this._ws.send(data);
-			},
+			}
 			/**
 			* Close the connection manually. Trows an error when the websocket is not connected.
 			*/
-			close: function() {
+			close() {
 				if(!this._ws) {
 					throw new Error("websocket-component(close): not connected.");
 				}
 				this._ws.close();
 				this._ws = null;
-			},
-			_onwsopen: function() {
+			}
+			_onwsopen() {
 				this.fire("websocket-open");
-			},
-			_onwserror: function(error) {
+			}
+			_onwserror(error) {
 				this._setStatus(-1);
 				this.fire("websocket-error", {data: error.data});
-			},
-			_onwsmessage: function(event) {
+			}
+			_onwsmessage(event) {
 				this.fire("websocket-message", { data: event.data });
-			},
-			_onwsclose: function(event) {
+			}
+			_onwsclose(event) {
 				this._setStatus(-1);
 				this.fire("websocket-close", { code: event.code, reason: event.reason });
-			},
-			_computeStatus: function(readyState) {
+			}
+			_computeStatus(readyState) {
 				if(this._ws) {
 					this._setStatus(this._ws.readyState);
 				}
 				else {
 					this._setStatus(-1);
 				}
-			},
-			_urlChange: function() {
+			}
+			_urlChange() {
 				if(this.auto && this.url.length > 0) {
 					if(this._ws) {
 						this.close();
 					}
 					this.open();
 				}
-			},
-			_autoChange: function() {
+			}
+			_autoChange() {
 				if(!this._ws && this.auto && this.url.length > 0) {
 					this.open();
 				}
-			},
-			_wsChange: function() {
+			}
+			_wsChange() {
 				if(!this._ws) {
 					this._computeStatus(undefined);
 				}
-			},
-			_handleVisibilityChange: function() {
+			}
+			_handleVisibilityChange() {
 				if (document.hidden) {
 					this.close();
 				} else {
 					this.open();
 				}
 			}
-		});
+		}
+
+		window.customElements.define(WebsocketComponent.is, WebsocketComponent);
 	</script>
 </dom-module>
