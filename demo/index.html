@@ -4,27 +4,36 @@ This code may only be used under the BSD style license found at http://wburgers.
 -->
 <!doctype html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-		<title>websocket-component Demo</title>
-		<script src="../../webcomponentsjs/webcomponents-lite.min.js"></script>
-		<link rel="import" href="../websocket-component.html">
-	</head>
-	<body>
-		Check your console!
-		<websocket-component id="websocket" url="wss://echo.websocket.org" auto handle-visibility></websocket-component>
-		<script>
-			var ws_element = document.getElementById('websocket');
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <title>websocket-component Demo</title>
 
-			document.addEventListener('websocket-message', function(event) {
-				console.log("Message received from echo websocket server:", event.detail.data);
-			});
+  <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+  <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+  <link rel="import" href="../websocket-component.html">
 
-			document.addEventListener('websocket-open', function() {
-				ws_element.send("test");
-			});
-		</script>
+  <style is="custom-style" include="demo-pages-shared-styles">
+  </style>
+</head>
+<body>
+Check your console!
+<demo-snippet>
+  <template>
+    <websocket-component id="websocket" url="wss://echo.websocket.org" auto handle-visibility></websocket-component>
+  </template>
+</demo-snippet>
+<script>
+  const ws_element = document.getElementById('websocket');
 
-	</body>
+  ws_element.addEventListener('websocket-message', function (event) {
+    console.log("Message received from echo websocket server:", event.detail.data);
+  });
+
+  ws_element.addEventListener('websocket-open', function () {
+    ws_element.send("test");
+  });
+</script>
+
+</body>
 </html>

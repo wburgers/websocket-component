@@ -44,9 +44,7 @@ Example:
            */
           protocols: {
             type: Array,
-            value: function () {
-              return [];
-            }
+            value:  () => []
           },
           /**
            * This status represents the websocket status. Any other element can bind to this status to get updates.
@@ -127,18 +125,18 @@ Example:
 				this._ws = null;
 			}
 			_onwsopen() {
-				this.fire("websocket-open");
+				this.dispatchEvent(new CustomEvent("websocket-open"));
 			}
 			_onwserror(error) {
 				this._setStatus(-1);
-				this.fire("websocket-error", {data: error.data});
+				this.dispatchEvent(new CustomEvent("websocket-error", { detail: { data: error.data}} ));
 			}
 			_onwsmessage(event) {
-				this.fire("websocket-message", { data: event.data });
+				this.dispatchEvent(new CustomEvent("websocket-message", { detail: { data: event.data }} ));
 			}
 			_onwsclose(event) {
 				this._setStatus(-1);
-				this.fire("websocket-close", { code: event.code, reason: event.reason });
+				this.dispatchEvent(new CustomEvent("websocket-close", { detail: { code: event.code, reason: event.reason }} ));
 			}
 			_computeStatus(readyState) {
 				if(this._ws) {
