@@ -1,8 +1,7 @@
 <!--
-Copyright (c) 2016 Willem Burgers.
-							2017 Sebastian Tilsch
-All rights reserved.
+Copyright (c) 2017 Willem Burgers. All rights reserved.
 This code may only be used under the BSD style license found at http://wburgers.github.io/LICENSE.txt
+For a list of Contributors check https://github.com/wburgers/websocket-component/graphs/contributors
 -->
 <link rel="import" href="../polymer/polymer.html">
 
@@ -10,7 +9,6 @@ This code may only be used under the BSD style license found at http://wburgers.
 A Polymer wrapper for a websocket connection.
 
 Example:
-
     <websocket-component auto handle-visibility url="wss://echo.websocket.org"></websocket-component>
 
 @element websocket-component
@@ -30,61 +28,59 @@ Example:
 			static get is() { return "websocket-component"; }
 
 			static get properties() {
-        return {
-          /**
-           * The url to connect to
-           */
-          url: {
-            type: String,
-            value: "",
-            observer: '_urlChange'
-          },
-          /**
-           * An array of subprotocols for the websocket
-           */
-          protocols: {
-            type: Array,
-            value:  () => []
-          },
-          /**
-           * This status represents the websocket status. Any other element can bind to this status to get updates.
-           */
-          status: {
-            type: Number,
-            readOnly: true,
-            notify: true,
-            value: -1
-          },
-          /**
-           * If this boolean is set, the websocket will automatically connect when the url is specified
-           */
-          auto: {
-            type: Boolean,
-            value: false,
-            observer: '_autoChange'
-          },
-          /**
-           * If this boolean is set, the websocket will automatically close and reopen when the tab/page is out of focus and focussed again respectively
-           */
-          handleVisibility: {
-            type: Boolean,
-            value: false,
-          },
-          _ws: {
-            type: Object,
-            observer: '_wsChange'
-          }
-        }
-      }
+				return {
+					/**
+					* The url to connect to
+					*/
+					url: {
+			            type: String,
+			            value: "",
+						observer: '_urlChange'
+					},
+					/**
+					* An array of subprotocols for the websocket
+					*/
+					protocols: {
+						type: Array,
+						value:  () => []
+					},
+					/**
+					* This status represents the websocket status. Any other element can bind to this status to get updates.
+					*/
+					status: {
+						type: Number,
+						readOnly: true,
+						notify: true,
+						value: -1
+					},
+					/**
+					* If this boolean is set, the websocket will automatically connect when the url is specified
+					*/
+					auto: {
+						type: Boolean,
+						value: false,
+						observer: '_autoChange'
+					},
+					/**
+					* If this boolean is set, the websocket will automatically close and reopen when the tab/page is out of focus and focussed again respectively
+					*/
+					handleVisibility: {
+						type: Boolean,
+						value: false,
+					},
+					_ws: {
+						type: Object,
+						observer: '_wsChange'
+					}
+				}
+			}
 
 			static get observers() {
-        return [
-          '_computeStatus(_ws.readyState)'
-        ]
-      }
+				return ['_computeStatus(_ws.readyState)']
+			}
 
-      ready() {
-			  super.ready();
+			ready() {
+				super.ready();
 				if (this.handleVisibility && typeof document.hidden !== 'undefined') {
 					document.addEventListener('visibilitychange', this._handleVisibilityChange.bind(this), false);
 				}
