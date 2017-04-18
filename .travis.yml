@@ -1,7 +1,7 @@
 dist: trusty
 language: node_js
 sudo: required
-node_js: stable
+node_js: '6'
 branches:
   except:
     - gh-pages
@@ -19,8 +19,7 @@ env:
     - GH_REF=github.com/wburgers/websocket-component.git
     - secure: sSIqNcjL3ETUtjN7mzdVWLRa4X+xbIhBKxqJ3BSn7bWceTsWnbyK0bWIuOv4yljlIJDvTtIIrYzTeq+2LM7NUloIxs/U+zyj94LrCVl5lW8t+yjl+Vs/waY1CXT3Niv+X8hD++Fo2g7wro2BXjszPhzRsHN/aeqxuhQy0D90xxcywy71SP0NajTu5fq/lU5IkdDzc1D50uYU65aTqxiUF1rl19c1uYka5rnKEgJsVMvHvTHTgVBIW4hArZViwwpVYVmhGq4550Se1pyCG5z8W+v357XDYiZRxAM/yGkM2sRTL6u7lSsoLdp8qGO+q7RYDMt6lwL7rifcvEeb15Hp0YKxakYX0b7PQAomQNjTuARYMVelc6XbtgR69HsBgBuDK4rLES+vzhncJ5J8RggE97z4WMIfLsWunQLzB1ERXAYKhmhrdC3Kph9DUXzo2lUZfJUSsVpnDijMWY7ADr2ubWG2cgjHU1J+1u3sEJeN8dgyhgD/CXCVBo7e949SWJdSvN0O1gvSQnmYCIQEM8brX1t50T5JyFdL9GBRjUPELX4rFruvSsNd9lr3/lmhXJXyJSC40otP+YBtb2aQUuEn2UzqBoEOccMJv2kKn+/x6uKaYuA8OkK/VZBuiCCjafYwT/Q7mIIbsQmPSz9c/DTZuhIWfAe373TVELtS4HgGm8Q=
 before_script:
-  - npm install web-component-tester
-  - npm install bower
+  - npm install -g bower web-component-tester
   - 'export PATH=$PWD/node_modules/.bin:$PATH'
   - bower install
 script:
