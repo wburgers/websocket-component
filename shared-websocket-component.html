@@ -1,0 +1,71 @@
+<!--
+Copyright (c) 2016 Willem Burgers.
+							2017 Sebastian Tilsch
+All rights reserved.
+This code may only be used under the BSD style license found at http://wburgers.github.io/LICENSE.txt
+-->
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="websocket-component.html">
+<link rel="import" href="websocket-sharing-behavior.html">
+
+<!--
+A Polymer wrapper for a websocket connection that is shared among certain instances by a ID.
+
+Example:
+
+    <shared-websocket-component socket-id="someID" auto handle-visibility url="wss://echo.websocket.org"></websocket-component>
+
+@element shared-websocket-component
+@demo demo/index.html
+-->
+
+<dom-module id="shared-websocket-component">
+    <template>
+        <style>
+            :host {
+                display: none;
+            }
+        </style>
+    </template>
+    <script>
+      class SharedWebsocketComponent extends WebsocketSharingBehavior( WebsocketComponentBehavior(Polymer.Element) ) {
+        static get is() {
+          return "shared-websocket-component";
+        }
+
+        /**
+         * Open the connection manually. May throw errors when already connected or no url is specified.
+         */
+        open() {
+          if (!this || !this.url || this.url === "") {
+            throw new Error("shared-websocket-component(open): no url specified.");
+          }
+          if(!this.socketId || this.socketId === "") {
+            throw new Error("shared-websocket-component(open): no socketId specified.");
+          }
+          if (this._ws) {
+            throw new Error("shared-websocket-component(open): already connected");
+          }
+          this._ws = this.getOrCreateSocket(this.url, this.protocols)
+          this._ws.onopen = this._onwsopen.bind(this);
+          this._ws.onerror = this._onwserror.bind(this);
+          this._ws.onmessage = this._onwsmessage.bind(this);
+          this._ws.onclose = this._onwsclose.bind(this);
+        }
+
+        /**
+         * Close the connection manually. Trows an error when the websocket is not connected.
+         */
+        close() {
+          if (!this || !this._ws) {
+            throw new Error("shared-websocket-component(close): not connected.");
+          }
+          this._ws.close();
+          this._ws = null;
+          this.removeWebsocket()
+        }
+      }
+
+      window.customElements.define(SharedWebsocketComponent.is, SharedWebsocketComponent);
+    </script>
+</dom-module>

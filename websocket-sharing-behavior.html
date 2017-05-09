@@ -1,0 +1,39 @@
+<link rel="import" href="../polymer/polymer.html">
+<script>
+  /** @polymerBehavior */
+  const WebsocketSharingBehavior = subclass => class extends subclass {
+
+    static get properties() {
+      return {
+        socketId: {
+          type: String
+        },
+        _websockets: {
+          type: Object,
+          value: new Map()
+        }
+      }
+    }
+
+
+    /**
+     * Tries to get an instance of a websocket by the socketId
+     * If it does not exist it creates a new Websocket
+     * @param socketId
+     * @param socketUrl
+     * @param socketProtocols
+     */
+    getOrCreateSocket(socketUrl, socketProtocols, _socketId) {
+      const socketId = _socketId | this.socketId;
+      if (!this._websockets.has(socketId)) {
+        this._websockets.set(socketId, new WebSocket(socketUrl, socketProtocols));
+      }
+      return this._websockets.get(socketId);
+    }
+
+    removeWebsocket(_socketId) {
+      const socketId = _socketId | this.socketId;
+      this._websockets.delete(socketId)
+    }
+  }
+</script>
