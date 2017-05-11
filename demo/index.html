@@ -9,6 +9,11 @@ This code may only be used under the BSD style license found at http://wburgers.
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
   <title>websocket-component Demo</title>
 
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+
+  <link rel="import" href="../../polymer/polymer.html">
+
   <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
   <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
   <link rel="import" href="../websocket-component.html">
@@ -27,12 +32,12 @@ This code may only be used under the BSD style license found at http://wburgers.
         <h3>Standard websocket-component single request</h3>
         Check your console!
         <demo-snippet class="centered-demo">
-<!--            <websocket-component
+            <websocket-component
                     id="websocket"
                     url="wss://echo.websocket.org" auto handle-visibility
                     on-websocket-open="_sendWebsocketMessage"
                     on-websocket-message="_addWebsocketMessage">
-            </websocket-component>-->
+            </websocket-component>
             <pre>
           <template is="dom-repeat" items="[[websocketMessages]]">
               [[item]]
@@ -74,51 +79,52 @@ This code may only be used under the BSD style license found at http://wburgers.
 </dom-module>
 <script>
   const ws_element = document.getElementById('websocket');
+  addEventListener('WebComponentsReady', function() {
+    class WebsocketDemo extends Polymer.Element {
+      static get is() {
+        return "websocket-demo";
+      }
 
-  class WebsocketDemo extends Polymer.Element {
-    static get is() {
-      return "websocket-demo";
-    }
-
-    static get properties() {
-      return {
-        websocketMessages: {
-          type: Array,
-          notify: true,
-          value: () => []
-        },
-        sharedWebsocketMessages: {
-          type: Array,
-          notify: true,
-          value: () => []
+      static get properties() {
+        return {
+          websocketMessages: {
+            type: Array,
+            notify: true,
+            value: () => []
+          },
+          sharedWebsocketMessages: {
+            type: Array,
+            notify: true,
+            value: () => []
+          }
         }
+      }
+
+      _addWebsocketMessage(event) {
+        console.log("Message received from echo websocket server:", event.detail.data);
+        this.push('websocketMessages', (new Date()).toLocaleTimeString() + ' -- ' + event.detail.data);
+      }
+
+      _sendWebsocketMessage(event) {
+        this.$.websocket.send("test");
+      }
+
+      _addSharedWebsocketMessage(event) {
+        console.log("Message received from shared websocket " + event.target.id + " echo websocket server:", event.detail.data);
+        this.push('sharedWebsocketMessages', (new Date()).toLocaleTimeString() + ' -- ' + event.target.id + "  received  " + event.detail.data);
+      }
+
+      _sendSharedWebsocketMessage(event) {
+        const wsElement = event.target;
+        wsElement.send("My name is " + wsElement.id);
+        window.setTimeout(() => {
+          wsElement.send("2nd shared message from " + wsElement.id)
+        }, 1000);
       }
     }
 
-    _addWebsocketMessage(event) {
-      console.log("Message received from echo websocket server:", event.detail.data);
-      this.push('websocketMessages', (new Date()).toLocaleTimeString() + ' -- ' +  event.detail.data);
-    }
-
-    _sendWebsocketMessage(event) {
-      this.$.websocket.send("test");
-    }
-
-    _addSharedWebsocketMessage(event) {
-      console.log("Message received from shared websocket " +  event.path[0].id +" echo websocket server:", event.detail.data);
-      this.push('sharedWebsocketMessages', (new Date()).toLocaleTimeString() + ' -- ' + event.path[0].id + "  received  " + event.detail.data);
-    }
-
-    _sendSharedWebsocketMessage(event) {
-      event.path[0].send("My name is " + event.path[0].id);
-      window.setTimeout(() => {
-        event.path[0].send("2nd shared message from " + event.path[0].id)
-      }, 1000);
-    }
-  }
-
-  window.customElements.define(WebsocketDemo.is, WebsocketDemo);
-
+    window.customElements.define(WebsocketDemo.is, WebsocketDemo);
+  });
 </script>
 
 </body>

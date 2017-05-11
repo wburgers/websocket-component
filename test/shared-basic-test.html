@@ -8,7 +8,7 @@ This code may only be used under the BSD style license found at http://wburgers.
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
 
-    <script src="../../webcomponentsjs/webcomponents-lite.min.js"></script>
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
 	<script src="../../web-component-tester/browser.js"></script>
 
     <link rel="import" href="../shared-websocket-component.html">
@@ -72,11 +72,11 @@ This code may only be used under the BSD style license found at http://wburgers.
 			});
 
 			test('open without url throws exception', function() {
-				expect(websocketElementWithoutURL.open).to.throw(Error, 'shared-websocket-component(open): no url specified.');
+				expect(() => websocketElementWithoutURL.open()).to.throw(Error, 'shared-websocket-component(open): no url specified.');
 			});
 
 			test('close without an open connection throws error', function() {
-				expect(websocketElementWithoutURL.close).to.throw(Error, 'shared-websocket-component(close): not connected.');
+				expect(() => websocketElementWithoutURL.close()).to.throw(Error, 'shared-websocket-component(close): not connected.');
 			});
 
 			test('send without an open connection throws error', function() {
@@ -86,7 +86,7 @@ This code may only be used under the BSD style license found at http://wburgers.
 			});
 
 			test('element without socket-id throws error', function() {
-			  expect(websocketElementWithoutSocketId.open).to.throw(Error, 'shared-websocket-component(open): no socketId specified.');
+			  expect(() => websocketElementWithoutSocketId.open()).to.throw(Error, 'shared-websocket-component(open): no socketId specified.');
 			});
 
 			test('element with a url and a socket-id loads ok', function() {

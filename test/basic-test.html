@@ -8,7 +8,7 @@ This code may only be used under the BSD style license found at http://wburgers.
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
 
-    <script src="../../webcomponentsjs/webcomponents-lite.min.js"></script>
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
 	<script src="../../web-component-tester/browser.js"></script>
 
     <link rel="import" href="../websocket-component.html">
@@ -65,11 +65,11 @@ This code may only be used under the BSD style license found at http://wburgers.
 			});
 
 			test('open without url throws exception', function() {
-				expect(websocketElementWithoutURL.open).to.throw(Error, 'websocket-component(open): no url specified.');
+				expect(() => websocketElementWithoutURL.open()).to.throw(Error, 'websocket-component(open): no url specified.');
 			});
 
 			test('close without an open connection throws error', function() {
-				expect(websocketElementWithoutURL.close).to.throw(Error, 'websocket-component(close): not connected.');
+				expect(() => websocketElementWithoutURL.close()).to.throw(Error, 'websocket-component(close): not connected.');
 			});
 
 			test('send without an open connection throws error', function() {
