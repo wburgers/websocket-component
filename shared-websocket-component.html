@@ -33,6 +33,15 @@ Example:
           return "shared-websocket-component";
         }
 
+        static get properties() {
+          return {
+            _wsReadyFired: {
+              type: Boolean,
+              value: false
+            }
+          };
+        }
+
         /**
          * Open the connection manually. May throw errors when already connected or no url is specified.
          */
@@ -59,6 +68,10 @@ Example:
           addEvent("error", this._onwserror);
           addEvent("message", this._onwsmessage);
           addEvent("close", this._onwsclose);
+          if(this.status === 1 && !this._wsReadyFired) {
+            this._wsReadyFired = true;
+            this.dispatchEvent(new CustomEvent("websocket-ready"));
+          }
         }
 
         /**
@@ -72,6 +85,14 @@ Example:
           this._ws = null;
           this.removeWebsocket()
         }
+        _onwsopen() {
+          this.dispatchEvent(new CustomEvent("websocket-open"));
+          if(!this._wsReadyFired) {
+            this._wsReadyFired = true;
+            this.dispatchEvent(new CustomEvent("websocket-ready"));
+          }
+        }
+
       }
 
       window.customElements.define(SharedWebsocketComponent.is, SharedWebsocketComponent);

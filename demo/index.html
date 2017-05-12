@@ -52,21 +52,27 @@ This code may only be used under the BSD style license found at http://wburgers.
                     socket-id="11"
                     url="wss://echo.websocket.org" auto handle-visibility
                     on-websocket-open="_sendSharedWebsocketMessage"
-                    on-websocket-message="_addSharedWebsocketMessage">
+                    on-websocket-message="_addSharedWebsocketMessage"
+                    on-websocket-ready="_addReadyMessage"
+            >
             </shared-websocket-component>
             <shared-websocket-component
                     id="websocket_111"
                     socket-id="11"
                     url="wss://echo.websocket.org" auto handle-visibility
                     on-websocket-open="_sendSharedWebsocketMessage"
-                    on-websocket-message="_addSharedWebsocketMessage">
+                    on-websocket-message="_addSharedWebsocketMessage"
+                    on-websocket-ready="_addReadyMessage"
+            >
             </shared-websocket-component>
             <shared-websocket-component
                     id="websocket_120"
                     socket-id="12"
                     url="wss://echo.websocket.org" auto handle-visibility
                     on-websocket-open="_sendSharedWebsocketMessage"
-                    on-websocket-message="_addSharedWebsocketMessage">
+                    on-websocket-message="_addSharedWebsocketMessage"
+                    on-websocket-ready="_addReadyMessage"
+            >
             </shared-websocket-component>
             <pre>
           <template is="dom-repeat" items="[[sharedWebsocketMessages]]">
@@ -112,6 +118,9 @@ This code may only be used under the BSD style license found at http://wburgers.
       _addSharedWebsocketMessage(event) {
         console.log("Message received from shared websocket " + event.target.id + " echo websocket server:", event.detail.data);
         this.push('sharedWebsocketMessages', (new Date()).toLocaleTimeString() + ' -- ' + event.target.id + "  received  " + event.detail.data);
+      }
+      _addReadyMessage(event) {
+        this.push('sharedWebsocketMessages', (new Date()).toLocaleTimeString() + ' -- ' + event.target.id + "  is ready ");
       }
 
       _sendSharedWebsocketMessage(event) {
