@@ -86,7 +86,7 @@ Example:
           this.removeWebsocket()
         }
         _onwsopen() {
-          this.dispatchEvent(new CustomEvent("websocket-open"));
+          super._onwsopen();
           if(!this._wsReadyFired) {
             this._wsReadyFired = true;
             this.dispatchEvent(new CustomEvent("websocket-ready"));

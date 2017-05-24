@@ -5,9 +5,16 @@
 
     static get properties() {
       return {
+        /**
+         * The socketId is the identifier for the shared socket, if a socket with the given identifier exists it
+         * will be used, if not, a new one will be created.
+         */
         socketId: {
           type: String
         },
+        /**
+         * a Map of websockets ( identifier -> WebScoket ) that is shared across all instances
+         */
         _websockets: {
           type: Object,
           value: new Map()
