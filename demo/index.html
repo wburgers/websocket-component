@@ -1,6 +1,7 @@
 <!--
 Copyright (c) 2016 Willem Burgers. All rights reserved.
 This code may only be used under the BSD style license found at http://wburgers.github.io/LICENSE.txt
+For a list of Contributors check https://github.com/wburgers/websocket-component/graphs/contributors
 -->
 <!doctype html>
 <html>
@@ -8,20 +9,29 @@ This code may only be used under the BSD style license found at http://wburgers.
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
 		<title>websocket-component Demo</title>
-		<script src="../../webcomponentsjs/webcomponents-lite.min.js"></script>
+
+		<link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+		<link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
 		<link rel="import" href="../websocket-component.html">
+
+		<style is="custom-style" include="demo-pages-shared-styles">
+		</style>
 	</head>
 	<body>
 		Check your console!
-		<websocket-component id="websocket" url="wss://echo.websocket.org" auto handle-visibility></websocket-component>
+		<demo-snippet>
+			<template>
+				<websocket-component id="websocket" url="wss://echo.websocket.org" auto handle-visibility></websocket-component>
+			</template>
+		</demo-snippet>
 		<script>
-			var ws_element = document.getElementById('websocket');
+			const ws_element = document.getElementById('websocket');
 
-			document.addEventListener('websocket-message', function(event) {
+			ws_element.addEventListener('websocket-message', function (event) {
 				console.log("Message received from echo websocket server:", event.detail.data);
 			});
 
-			document.addEventListener('websocket-open', function() {
+			ws_element.addEventListener('websocket-open', function () {
 				ws_element.send("test");
 			});
 		</script>
