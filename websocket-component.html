@@ -132,7 +132,15 @@ Example:
             }
             this.push('_sendQueue', data);
           } else {
-            this._ws.send(data);
+            try {
+              this._ws.send(data);
+            } catch(error) {
+              if(this.queueIfFailed) {
+                this.push('_sendQueue', data);
+              } else {
+                throw new Error("websocket-component(send): failed.", error);
+              }
+            }
           }
         }
 
