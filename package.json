@@ -15,10 +15,10 @@
     "bower_components"
   ],
   "dependencies": {
-    "Polymer": "^1.1.0"
+    "@polymer/polymer": "^2.0.0"
   },
   "devDependencies": {
-    "iron-component-page": "^1.0.0",
-		"web-component-tester": "*"
+    "@polymer/iron-demo-helpers": "*",
+    "web-component-tester": "*"
   }
 }
