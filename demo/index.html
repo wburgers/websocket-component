@@ -10,31 +10,132 @@ For a list of Contributors check https://github.com/wburgers/websocket-component
 		<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
 		<title>websocket-component Demo</title>
 
-		<link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
-		<link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
-		<link rel="import" href="../websocket-component.html">
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
 
-		<style is="custom-style" include="demo-pages-shared-styles">
-		</style>
-	</head>
-	<body>
-		Check your console!
-		<demo-snippet>
-			<template>
-				<websocket-component id="websocket" url="wss://echo.websocket.org" auto handle-visibility></websocket-component>
-			</template>
-		</demo-snippet>
-		<script>
-			const ws_element = document.getElementById('websocket');
 
-			ws_element.addEventListener('websocket-message', function (event) {
-				console.log("Message received from echo websocket server:", event.detail.data);
-			});
+  <link rel="import" href="../../polymer/polymer.html">
 
-			ws_element.addEventListener('websocket-open', function () {
-				ws_element.send("test");
-			});
-		</script>
+  <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+  <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+  <link rel="import" href="../websocket-component.html">
+  <link rel="import" href="../shared-websocket-component.html">
+
+  <style is="custom-style" include="demo-pages-shared-styles">
+  </style>
+</head>
+<body>
+
+<websocket-demo></websocket-demo>
+
+<dom-module id="websocket-demo">
+    <template>
+    <div class="vertical-section-container centered">
+        <h3>Standard websocket-component single request</h3>
+        Check your console!
+        <demo-snippet class="centered-demo">
+            <websocket-component
+                    id="websocket"
+                    url="wss://echo.websocket.org" auto handle-visibility
+                    on-websocket-open="_sendWebsocketMessage"
+                    on-websocket-message="_addWebsocketMessage">
+            </websocket-component>
+            <pre>
+          <template is="dom-repeat" items="[[websocketMessages]]">
+              [[item]]
+          </template>
+          </pre>
+        </demo-snippet>
+        <h3>Shared websocket-component multi request</h3>
+        Check your console!
+        <demo-snippet class="centered-demo">
+            <shared-websocket-component
+                    id="websocket_110"
+                    socket-id="11"
+                    url="wss://echo.websocket.org" auto handle-visibility
+                    on-websocket-open="_sendSharedWebsocketMessage"
+                    on-websocket-message="_addSharedWebsocketMessage"
+                    on-websocket-ready="_addReadyMessage"
+            >
+            </shared-websocket-component>
+            <shared-websocket-component
+                    id="websocket_111"
+                    socket-id="11"
+                    url="wss://echo.websocket.org" auto handle-visibility
+                    on-websocket-open="_sendSharedWebsocketMessage"
+                    on-websocket-message="_addSharedWebsocketMessage"
+                    on-websocket-ready="_addReadyMessage"
+            >
+            </shared-websocket-component>
+            <shared-websocket-component
+                    id="websocket_120"
+                    socket-id="12"
+                    url="wss://echo.websocket.org" auto handle-visibility
+                    on-websocket-open="_sendSharedWebsocketMessage"
+                    on-websocket-message="_addSharedWebsocketMessage"
+                    on-websocket-ready="_addReadyMessage"
+            >
+            </shared-websocket-component>
+            <pre>
+          <template is="dom-repeat" items="[[sharedWebsocketMessages]]">
+              [[item]]
+          </template>
+          </pre>
+        </demo-snippet>
+    </div>
+    </template>
+</dom-module>
+<script>
+  const ws_element = document.getElementById('websocket');
+  addEventListener('WebComponentsReady', function() {
+    class WebsocketDemo extends Polymer.Element {
+      static get is() {
+        return "websocket-demo";
+      }
+
+      static get properties() {
+        return {
+          websocketMessages: {
+            type: Array,
+            notify: true,
+            value: () => []
+          },
+          sharedWebsocketMessages: {
+            type: Array,
+            notify: true,
+            value: () => []
+          }
+        }
+      }
+
+      _addWebsocketMessage(event) {
+        console.log("Message received from echo websocket server:", event.detail.data);
+        this.push('websocketMessages', (new Date()).toLocaleTimeString() + ' -- ' + event.detail.data);
+      }
+
+      _sendWebsocketMessage(event) {
+        this.$.websocket.send("test");
+      }
+
+      _addSharedWebsocketMessage(event) {
+        console.log("Message received from shared websocket " + event.target.id + " echo websocket server:", event.detail.data);
+        this.push('sharedWebsocketMessages', (new Date()).toLocaleTimeString() + ' -- ' + event.target.id + "  received  " + event.detail.data);
+      }
+      _addReadyMessage(event) {
+        this.push('sharedWebsocketMessages', (new Date()).toLocaleTimeString() + ' -- ' + event.target.id + "  is ready ");
+      }
+
+      _sendSharedWebsocketMessage(event) {
+        const wsElement = event.target;
+        wsElement.send("My name is " + wsElement.id);
+        window.setTimeout(() => {
+          wsElement.send("2nd shared message from " + wsElement.id)
+        }, 1000);
+      }
+    }
+
+    window.customElements.define(WebsocketDemo.is, WebsocketDemo);
+  });
+</script>
 
 	</body>
 </html>

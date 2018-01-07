@@ -1,7 +1,6 @@
 <!--
-Copyright (c) 2017 Willem Burgers. All rights reserved.
+Copyright (c) 2016 Willem Burgers. All rights reserved.
 This code may only be used under the BSD style license found at http://wburgers.github.io/LICENSE.txt
-For a list of Contributors check https://github.com/wburgers/websocket-component/graphs/contributors
 -->
 <!doctype html>
 <html>
@@ -12,31 +11,37 @@ For a list of Contributors check https://github.com/wburgers/websocket-component
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
 	<script src="../../web-component-tester/browser.js"></script>
 
-    <link rel="import" href="../websocket-component.html">
+    <link rel="import" href="../shared-websocket-component.html">
   </head>
   <body>
 
     <test-fixture id="websocketComponentWithoutURL">
 		<template>
-			<websocket-component></websocket-component>
+			<shared-websocket-component></shared-websocket-component>
 		</template>
 	</test-fixture>
 
-	<test-fixture id="websocketComponentWithURL">
+	<test-fixture id="websocketComponentWithoutSocketId">
 		<template>
-			<websocket-component url="ws://echo.websocket.org"></websocket-component>
+			<shared-websocket-component url="ws://echo.websocket.org"></shared-websocket-component>
+		</template>
+	</test-fixture>
+
+	<test-fixture id="websocketComponentWithURLAndSocketId">
+		<template>
+			<shared-websocket-component socket-id="1" url="ws://echo.websocket.org"></shared-websocket-component>
 		</template>
 	</test-fixture>
 
 	<test-fixture id="websocketComponentWithActiveConnection">
 		<template>
-			<websocket-component auto url="ws://echo.websocket.org"></websocket-component>
+			<shared-websocket-component socket-id="2" auto url="ws://echo.websocket.org"></shared-websocket-component>
 		</template>
 	</test-fixture>
 
     <script>
 		var websocketElementWithoutURL;
-		var websocketElementWithURL;
+		var websocketElementWithURLAndSocketId;
 		var websocketElementWithActiveConnection;
 
 		var ws;
@@ -52,7 +57,8 @@ For a list of Contributors check https://github.com/wburgers/websocket-component
 			};
 			sinon.stub(window, "WebSocket").returns(ws);
 			websocketElementWithoutURL = fixture("websocketComponentWithoutURL");
-			websocketElementWithURL = fixture("websocketComponentWithURL");
+		    websocketElementWithoutSocketId = fixture("websocketComponentWithoutSocketId");
+			websocketElementWithURLAndSocketId = fixture("websocketComponentWithURLAndSocketId");
 			websocketElementWithActiveConnection = fixture("websocketComponentWithActiveConnection");
 		});
 
@@ -60,17 +66,17 @@ For a list of Contributors check https://github.com/wburgers/websocket-component
 			window.WebSocket.restore();
 		});
 
-		suite('<websocket-component>', function() {
+		suite('<shared-websocket-component>', function() {
 			test('element without url loads ok', function() {
 				expect(websocketElementWithoutURL).to.be.ok;
 			});
 
 			test('open without url throws exception', function() {
-				expect(() => websocketElementWithoutURL.open()).to.throw(Error, 'websocket-component(open): no url specified.');
+				expect(() => websocketElementWithoutURL.open()).to.throw(Error, 'shared-websocket-component(open): no url specified.');
 			});
 
 			test('close without an open connection throws error', function() {
-				expect(() => websocketElementWithoutURL.close()).to.throw(Error, 'websocket-component(close): not connected.');
+				expect(() => websocketElementWithoutURL.close()).to.throw(Error, 'shared-websocket-component(close): not connected.');
 			});
 
 			test('send without an open connection throws error', function() {
@@ -79,24 +85,28 @@ For a list of Contributors check https://github.com/wburgers/websocket-component
 				}).to.throw(Error, 'websocket-component(send): not connected.');
 			});
 
-			test('element with a url loads ok', function() {
-				expect(websocketElementWithURL).to.be.ok;
+			test('element without socket-id throws error', function() {
+			  expect(() => websocketElementWithoutSocketId.open()).to.throw(Error, 'shared-websocket-component(open): no socketId specified.');
+			});
+
+			test('element with a url and a socket-id loads ok', function() {
+				expect(websocketElementWithURLAndSocketId).to.be.ok;
 			});
 
 			test('element status is -1 on load', function() {
-				assert.equal(websocketElementWithURL.status, -1, "The status should be -1");
+				assert.equal(websocketElementWithURLAndSocketId.status, -1, "The status should be -1");
 			});
 
 			test('element status is 0 after connecting', function() {
-				websocketElementWithURL.open();
-				assert.equal(websocketElementWithURL.status, 0, "The status should be 0");
+				websocketElementWithURLAndSocketId.open();
+				assert.equal(websocketElementWithURLAndSocketId.status, 0, "The status should be 0");
 			});
 
 			test('element fires an event when the connection is opened', function(done) {
-				websocketElementWithURL.addEventListener('websocket-open', function() {
+				websocketElementWithURLAndSocketId.addEventListener('websocket-open', function() {
 					done();
 				});
-				websocketElementWithURL.open();
+				websocketElementWithURLAndSocketId.open();
 				ws.onopen();
 			});
 
@@ -105,7 +115,7 @@ For a list of Contributors check https://github.com/wburgers/websocket-component
 			});
 
 			test('element fires an event when data is received', function(done) {
-				var data = "test";
+				const data = "test";
 				websocketElementWithActiveConnection.addEventListener('websocket-message', function(event) {
 					assert.equal(event.detail.data, data);
 					done();
