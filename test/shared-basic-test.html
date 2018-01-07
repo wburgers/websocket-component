@@ -1,0 +1,192 @@
+<!--
+Copyright (c) 2018 Willem Burgers. All rights reserved.
+This code may only be used under the BSD style license found at http://wburgers.github.io/LICENSE.txt
+For a list of Contributors check https://github.com/wburgers/websocket-component/graphs/contributors
+-->
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+
+		<script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+		<script src="../../web-component-tester/browser.js"></script>
+
+		<link rel="import" href="../shared-websocket-component.html">
+	</head>
+	<body>
+		<test-fixture id="websocketComponentWithoutURL">
+			<template>
+				<shared-websocket-component></shared-websocket-component>
+			</template>
+		</test-fixture>
+
+		<test-fixture id="websocketComponentWithoutSocketId">
+			<template>
+				<shared-websocket-component url="ws://echo.websocket.org"></shared-websocket-component>
+			</template>
+		</test-fixture>
+
+		<test-fixture id="websocketComponentWithURLAndSocketId">
+			<template>
+				<shared-websocket-component socket-id="1" url="ws://echo.websocket.org"></shared-websocket-component>
+			</template>
+		</test-fixture>
+
+		<test-fixture id="websocketComponentWithURLAndSocketIdShared1">
+			<template>
+				<shared-websocket-component socket-id="2" url="ws://echo.websocket.org"></shared-websocket-component>
+			</template>
+		</test-fixture>
+
+		<test-fixture id="websocketComponentWithURLAndSocketIdShared2">
+			<template>
+				<shared-websocket-component socket-id="2" url="ws://echo.websocket.org"></shared-websocket-component>
+			</template>
+		</test-fixture>
+
+		<test-fixture id="websocketComponentWithActiveConnection">
+			<template>
+				<shared-websocket-component socket-id="3" auto url="ws://echo.websocket.org"></shared-websocket-component>
+			</template>
+		</test-fixture>
+
+		<script>
+			var websocketElementWithoutURL;
+			var websocketElementWithURLAndSocketId;
+			var websocketElementWithURLAndSocketIdShared1;
+			var websocketElementWithURLAndSocketIdShared2;
+			var websocketElementWithActiveConnection;
+
+			var ws;
+
+			setup(function() {
+				ws = {
+					readyState: 0,
+					_listeners: [],
+					send: function(data) {
+						this.onmessage({ 'data': data });
+					},
+					close: function() {
+						this.onclose({'code': 1000, 'reason': ''});
+					},
+					onopen: function() {
+						this._listeners["open"].forEach(function(callback) {
+							callback();
+						});
+					},
+					onmessage: function(event) {
+						this._listeners["message"].forEach(function(callback) {
+							callback(event);
+						});
+					},
+					onclose: function(event) {
+						this._listeners["close"].forEach(function(callback) {
+							callback(event);
+						});
+					},
+					addEventListener: function(name, callback) {
+						if(!this._listeners[name]) {
+							this._listeners[name] = [];
+						}
+						this._listeners[name].push(callback);
+					}
+				};
+				sinon.stub(window, "WebSocket").returns(ws);
+
+				websocketElementWithoutURL = fixture("websocketComponentWithoutURL");
+				websocketElementWithoutSocketId = fixture("websocketComponentWithoutSocketId");
+				websocketElementWithURLAndSocketId = fixture("websocketComponentWithURLAndSocketId");
+				websocketElementWithURLAndSocketIdShared1 = fixture("websocketComponentWithURLAndSocketIdShared1");
+				websocketElementWithURLAndSocketIdShared2 = fixture("websocketComponentWithURLAndSocketIdShared2");
+				websocketElementWithActiveConnection = fixture("websocketComponentWithActiveConnection");
+			});
+
+			teardown(function() {
+				try {
+					websocketElementWithActiveConnection.close();
+				} catch (error) {
+					console.log(error);
+				}
+				window.WebSocket.restore();
+			});
+
+			suite('<shared-websocket-component>', function() {
+				test('element without url loads ok', function() {
+					expect(websocketElementWithoutURL).to.be.ok;
+				});
+
+				test('open without url throws exception', function() {
+					expect(() => websocketElementWithoutURL.open()).to.throw(Error, 'shared-websocket-component(open): no url specified.');
+				});
+
+				test('close without an open connection throws error', function() {
+					expect(() => websocketElementWithoutURL.close()).to.throw(Error, 'shared-websocket-component(close): not connected.');
+				});
+
+				test('send without an open connection throws error', function() {
+					expect(function() {
+						websocketElementWithoutURL.send("test")
+					}).to.throw(Error, 'websocket-component(send): not connected.');
+				});
+
+				test('element without socket-id throws error', function() {
+					expect(() => websocketElementWithoutSocketId.open()).to.throw(Error, 'shared-websocket-component(open): no socketId specified.');
+				});
+
+				test('element with a url and a socket-id loads ok', function() {
+					expect(websocketElementWithURLAndSocketId).to.be.ok;
+				});
+
+				test('element status is -1 on load', function() {
+					assert.equal(websocketElementWithURLAndSocketId.status, -1, "The status should be -1");
+				});
+
+				test('element status is 0 after connecting', function() {
+					websocketElementWithURLAndSocketId.open();
+					assert.equal(websocketElementWithURLAndSocketId.status, 0, "The status should be 0");
+				});
+
+				test('element fires an event when the connection is opened', function(done) {
+					websocketElementWithURLAndSocketId.addEventListener('websocket-open', function() {
+						done();
+					});
+					websocketElementWithURLAndSocketId.open();
+					websocketElementWithURLAndSocketId._ws.onopen();
+				});
+
+				test('property "auto" connects automatically', function() {
+					assert.equal(websocketElementWithActiveConnection.status, 0, "The status should be 0");
+				});
+
+				test('element fires an event when data is received', function(done) {
+					const data = "test";
+					websocketElementWithActiveConnection.addEventListener('websocket-message', function(event) {
+						assert.equal(event.detail.data, data);
+						done();
+					});
+					websocketElementWithActiveConnection.addEventListener('websocket-open', function() {
+						websocketElementWithActiveConnection.send(data);
+					});
+					websocketElementWithActiveConnection._ws.onopen();
+				});
+
+				test('shared socket data is received', function(done) {
+					const data = "test";
+					websocketElementWithURLAndSocketIdShared1.addEventListener('websocket-message', function(event) {
+						assert.equal(event.detail.data, data);
+						done();
+					});
+					websocketElementWithURLAndSocketIdShared2.addEventListener('websocket-open', function() {
+						websocketElementWithURLAndSocketIdShared2.send(data);
+					});
+					websocketElementWithURLAndSocketIdShared1.open();
+					websocketElementWithURLAndSocketIdShared2.open();
+					websocketElementWithURLAndSocketIdShared2._ws.onopen();
+				});
+			});
+
+			a11ySuite("websocketComponentWithoutURL");
+		</script>
+	</body>
+</html>
