@@ -25,6 +25,13 @@ The following events are thrown:
 - "websocket-message": tells you a new message was received. `event.detail.data` contains the message.
 - "websocket-close": tells you the connection was closed. `event.detail.code` contains the closing code. `event.detail.reason` contains the reason code.
 
+```html
+<shared-websocket-component socket-id="1" url="ws://echo.websocket.org"></shared-websocket-component>
+```
+
+It is now possible to share a single websocket instance between multiple websocket-component instances. Set the socket-id property to indicate which websocket instance should be used.
+Thanks @bastiion!
+
 ### Install
 You can install this element with bower:
 ```bash

@@ -1,123 +1,138 @@
 <!--
-Copyright (c) 2017 Willem Burgers. All rights reserved.
+Copyright (c) 2018 Willem Burgers. All rights reserved.
 This code may only be used under the BSD style license found at http://wburgers.github.io/LICENSE.txt
 For a list of Contributors check https://github.com/wburgers/websocket-component/graphs/contributors
 -->
 <!doctype html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
 
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-	<script src="../../web-component-tester/browser.js"></script>
+		<script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+		<script src="../../web-component-tester/browser.js"></script>
 
-    <link rel="import" href="../websocket-component.html">
-  </head>
-  <body>
+		<link rel="import" href="../websocket-component.html">
+	</head>
+	<body>
 
-    <test-fixture id="websocketComponentWithoutURL">
-		<template>
-			<websocket-component></websocket-component>
-		</template>
-	</test-fixture>
+		<test-fixture id="websocketComponentWithoutURL">
+			<template>
+				<websocket-component></websocket-component>
+			</template>
+		</test-fixture>
 
-	<test-fixture id="websocketComponentWithURL">
-		<template>
-			<websocket-component url="ws://echo.websocket.org"></websocket-component>
-		</template>
-	</test-fixture>
+		<test-fixture id="websocketComponentWithURL">
+			<template>
+				<websocket-component url="ws://echo.websocket.org"></websocket-component>
+			</template>
+		</test-fixture>
 
-	<test-fixture id="websocketComponentWithActiveConnection">
-		<template>
-			<websocket-component auto url="ws://echo.websocket.org"></websocket-component>
-		</template>
-	</test-fixture>
+		<test-fixture id="websocketComponentWithActiveConnection">
+			<template>
+				<websocket-component auto url="ws://echo.websocket.org"></websocket-component>
+			</template>
+		</test-fixture>
 
-    <script>
-		var websocketElementWithoutURL;
-		var websocketElementWithURL;
-		var websocketElementWithActiveConnection;
+		<script>
+			var websocketElementWithoutURL;
+			var websocketElementWithURL;
+			var websocketElementWithActiveConnection;
 
-		var ws;
+			var ws;
 
-		setup(function() {
-			ws = {
-				readyState: 0,
-				send: function(data) {
-					this.onmessage({ 'data': data });
-				},
-				onopen: function() {
-				}
-			};
-			sinon.stub(window, "WebSocket").returns(ws);
-			websocketElementWithoutURL = fixture("websocketComponentWithoutURL");
-			websocketElementWithURL = fixture("websocketComponentWithURL");
-			websocketElementWithActiveConnection = fixture("websocketComponentWithActiveConnection");
-		});
-
-		teardown(function() {
-			window.WebSocket.restore();
-		});
-
-		suite('<websocket-component>', function() {
-			test('element without url loads ok', function() {
-				expect(websocketElementWithoutURL).to.be.ok;
+			setup(function() {
+				ws = {
+					readyState: 0,
+					_listeners: [],
+					send: function(data) {
+						this.onmessage({ 'data': data });
+					},
+					onopen: function() {
+						this._listeners["open"].forEach(function(callback) {
+							callback();
+						});
+					},
+					onmessage: function(event) {
+						this._listeners["message"].forEach(function(callback) {
+							callback(event);
+						});
+					},
+					addEventListener: function(name, callback) {
+						if(!this._listeners[name]) {
+							this._listeners[name] = [];
+						}
+						this._listeners[name].push(callback);
+					}
+				};
+				sinon.stub(window, "WebSocket").returns(ws);
+				websocketElementWithoutURL = fixture("websocketComponentWithoutURL");
+				websocketElementWithURL = fixture("websocketComponentWithURL");
+				websocketElementWithActiveConnection = fixture("websocketComponentWithActiveConnection");
 			});
 
-			test('open without url throws exception', function() {
-				expect(() => websocketElementWithoutURL.open()).to.throw(Error, 'websocket-component(open): no url specified.');
+			teardown(function() {
+				window.WebSocket.restore();
 			});
 
-			test('close without an open connection throws error', function() {
-				expect(() => websocketElementWithoutURL.close()).to.throw(Error, 'websocket-component(close): not connected.');
-			});
-
-			test('send without an open connection throws error', function() {
-				expect(function() {
-					websocketElementWithoutURL.send("test")
-				}).to.throw(Error, 'websocket-component(send): not connected.');
-			});
-
-			test('element with a url loads ok', function() {
-				expect(websocketElementWithURL).to.be.ok;
-			});
-
-			test('element status is -1 on load', function() {
-				assert.equal(websocketElementWithURL.status, -1, "The status should be -1");
-			});
-
-			test('element status is 0 after connecting', function() {
-				websocketElementWithURL.open();
-				assert.equal(websocketElementWithURL.status, 0, "The status should be 0");
-			});
-
-			test('element fires an event when the connection is opened', function(done) {
-				websocketElementWithURL.addEventListener('websocket-open', function() {
-					done();
+			suite('<websocket-component>', function() {
+				test('element without url loads ok', function() {
+					expect(websocketElementWithoutURL).to.be.ok;
 				});
-				websocketElementWithURL.open();
-				ws.onopen();
-			});
 
-			test('property "auto" connects automatically', function() {
-				assert.equal(websocketElementWithActiveConnection.status, 0, "The status should be 0");
-			});
-
-			test('element fires an event when data is received', function(done) {
-				var data = "test";
-				websocketElementWithActiveConnection.addEventListener('websocket-message', function(event) {
-					assert.equal(event.detail.data, data);
-					done();
+				test('open without url throws exception', function() {
+					expect(() => websocketElementWithoutURL.open()).to.throw(Error, 'websocket-component(open): no url specified.');
 				});
-				websocketElementWithActiveConnection.addEventListener('websocket-open', function() {
-					websocketElementWithActiveConnection.send(data);
-				});
-				ws.onopen();
-			});
-		});
 
-		a11ySuite("websocketComponentWithoutURL");
-    </script>
-  </body>
+				test('close without an open connection throws error', function() {
+					expect(() => websocketElementWithoutURL.close()).to.throw(Error, 'websocket-component(close): not connected.');
+				});
+
+				test('send without an open connection throws error', function() {
+					expect(function() {
+						websocketElementWithoutURL.send("test")
+					}).to.throw(Error, 'websocket-component(send): not connected.');
+				});
+
+				test('element with a url loads ok', function() {
+					expect(websocketElementWithURL).to.be.ok;
+				});
+
+				test('element status is -1 on load', function() {
+					assert.equal(websocketElementWithURL.status, -1, "The status should be -1");
+				});
+
+				test('element status is 0 after connecting', function() {
+					websocketElementWithURL.open();
+					assert.equal(websocketElementWithURL.status, 0, "The status should be 0");
+				});
+
+				test('element fires an event when the connection is opened', function(done) {
+					websocketElementWithURL.addEventListener('websocket-open', function() {
+						done();
+					});
+					websocketElementWithURL.open();
+					ws.onopen();
+				});
+
+				test('property "auto" connects automatically', function() {
+					assert.equal(websocketElementWithActiveConnection.status, 0, "The status should be 0");
+				});
+
+				test('element fires an event when data is received', function(done) {
+					var data = "test";
+					websocketElementWithActiveConnection.addEventListener('websocket-message', function(event) {
+						assert.equal(event.detail.data, data);
+						done();
+					});
+					websocketElementWithActiveConnection.addEventListener('websocket-open', function() {
+						websocketElementWithActiveConnection.send(data);
+					});
+					ws.onopen();
+				});
+			});
+
+			a11ySuite("websocketComponentWithoutURL");
+		</script>
+	</body>
 </html>
