@@ -162,7 +162,7 @@ Example:
 			}
 
 			_onwsopen() {
-				this._setStatus(1);
+				this._computeStatus(undefined);
 				this.dispatchEvent(new CustomEvent("websocket-open"));
 				this._processSendQueue();
 			}

@@ -49,6 +49,7 @@ For a list of Contributors check https://github.com/wburgers/websocket-component
 						this.onmessage({ 'data': data });
 					},
 					onopen: function() {
+						this.readyState = 1;
 						this._listeners["open"].forEach(function(callback) {
 							callback();
 						});

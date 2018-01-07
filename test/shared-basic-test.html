@@ -71,6 +71,7 @@ For a list of Contributors check https://github.com/wburgers/websocket-component
 						this.onclose({'code': 1000, 'reason': ''});
 					},
 					onopen: function() {
+						this.readyState = 1;
 						this._listeners["open"].forEach(function(callback) {
 							callback();
 						});
