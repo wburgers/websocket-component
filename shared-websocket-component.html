@@ -27,6 +27,10 @@ Example:
 		</style>
 	</template>
 	<script>
+		/**
+		* @extends {Polymer.Element}
+		* @appliesMixin WebsocketComponentBehavior
+		*/
 		class SharedWebsocketComponent extends WebsocketSharingBehavior( WebsocketComponentBehavior(Polymer.Element) ) {
 			static get is() {
 				return "shared-websocket-component";

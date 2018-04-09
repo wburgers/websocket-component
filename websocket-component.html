@@ -25,6 +25,10 @@ Example:
 		</style>
 	</template>
 	<script>
+		/**
+		* @mixinFunction
+		* @polymer
+		*/
 		const WebsocketComponentBehavior = subclass =>class extends subclass {
 			static get properties() {
 				return {
@@ -230,6 +234,10 @@ Example:
 			}
 		};
 
+		/**
+		* @extends {Polymer.Element}
+		* @appliesMixin WebsocketComponentBehavior
+		*/
 		class WebsocketComponent extends WebsocketComponentBehavior(Polymer.Element) {
 			static get is() {
 				return "websocket-component";
